@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.rdbms_20220140002.Navigation.PengelolaHalaman
 import com.example.rdbms_20220140002.ui.home.pages.HomeScreen
 import com.example.rdbms_20220140002.ui.theme.RDBMS_20220140002Theme
 
@@ -21,9 +22,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             RDBMS_20220140002Theme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    HomeScreen(
+                    PengelolaHalaman(
                         modifier = Modifier.padding(innerPadding),
-                        navigateToItemEntry = {}
                     )
                 }
             }
