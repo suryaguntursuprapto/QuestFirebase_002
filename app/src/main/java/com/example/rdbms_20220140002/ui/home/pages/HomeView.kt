@@ -44,136 +44,36 @@ import com.example.rdbms_20220140002.ui.PenyediaViewModel
 import com.example.rdbms_20220140002.ui.home.viewmodel.HomeUiState
 import com.example.rdbms_20220140002.ui.home.viewmodel.HomeViewModel
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DeleteConfirmationDialog(
-    onDeleteConfirm: () -> Unit,
-    onDeleteCancel: () -> Unit,
-    modifier: Modifier = Modifier
+fun HomeScreen(
+    navigateToItemEntry: () -> Unit,
+    modifier: Modifier = Modifier,
+    onDetailClick: (String) -> Unit = {},
+    viewModel: HomeViewModel = viewModel(factory = PenyediaViewModel.Factory),
 ){
-    AlertDialog(onDismissRequest = {/*do nothing*/},
-        title = { Text("Delete Data") },
-        text = { Text("Apakah anda yakin ingin menghapus data?") },
+    Scaffold(
         modifier = modifier,
-        dismissButton = {
-            TextButton(onClick = onDeleteCancel) {
-                Text(text = "Cancel")
+        topBar = { TopAppBar(title = { Text("Home")})},
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = navigateToItemEntry,
+                shape = MaterialTheme.shapes.medium,
+                modifier = Modifier.
+                padding(18.dp)
+            ) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Mahasiswa")
             }
         },
-        confirmButton = {
-            TextButton(onClick = onDeleteConfirm) {
-                Text(text = "Yes")
-            }
-        }
-    )
-}
-
-@Composable
-fun MhsCard(
-    mahasiswa: Mahasiswa,
-    modifier: Modifier = Modifier,
-    onDeleteClick: (Mahasiswa) -> Unit = {}
-) {
-    Card(
-        modifier = modifier,
-        shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = mahasiswa.nama,
-                    style = MaterialTheme.typography.titleLarge
-                )
-
-                Spacer(Modifier.weight(1f))
-                IconButton(onClick = { onDeleteClick(mahasiswa) }) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = null,
-                    )
-                }
-
-                Text(
-                    text = mahasiswa.nim,
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                Text(
-                    text = mahasiswa.kelas,
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                Text(
-                    text = mahasiswa.alamat,
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = mahasiswa.angkatan,
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun MhsLayout(
-    mahasiswa: List<Mahasiswa>,
-    modifier: Modifier = Modifier,
-    onDetailClick: (String) -> Unit,
-    onDeleteClick: (Mahasiswa) -> Unit
-){
-    LazyColumn (
-        modifier = modifier,
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ){
-        items(
-            items = mahasiswa,
-            itemContent = {mhs ->
-                MhsCard(
-                    mahasiswa = mhs,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {},
-                    onDeleteClick = {
-                        onDeleteClick(mhs)
-                    }
-                )
+    ) { innerPadding ->
+        HomeStatus(
+            homeUiState = viewModel.mhsUiState,
+            retryAction = { viewModel.getMhs() }, modifier = Modifier.padding(innerPadding),
+            onDetailClick = onDetailClick,
+            onDeleteClick = {
+                viewModel.getMhs()
             }
         )
-    }
-}
-
-@Composable
-fun OnLoading(modifier: Modifier = Modifier){
-    Text("Loading.......")
-}
-
-/*
-* The Home Screen displaying Error message with re-attempt button
-*/
-
-@Composable
-fun OnError(retryAction: () -> Unit,modifier: Modifier = Modifier){
-    Column (
-        modifier = modifier,
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ){
-        Text(
-            text = "Terjadi Kesalahan"
-        )
-        Button(onClick = retryAction) {
-            Text("Retry")
-        }
     }
 }
 
@@ -185,70 +85,138 @@ fun HomeStatus(
     onDeleteClick: (Mahasiswa) -> Unit = {},
     onDetailClick: (String) -> Unit
 ) {
-    var deleteConfirmationRequired by rememberSaveable { mutableStateOf<Mahasiswa?>(null) }
+    when (homeUiState) {
+        is HomeUiState.Loading -> OnLoading(modifier = modifier.fillMaxSize())
 
-
-
-    when(homeUiState) {
-        is HomeUiState.Loading -> OnLoading(modifier = Modifier.fillMaxSize())
-
-        is HomeUiState.Success -> {
-            MhsLayout(
-                mahasiswa = homeUiState.data, modifier = modifier.fillMaxWidth(), onDetailClick = {
-                    onDetailClick(it)
-                },
-                onDeleteClick = {
-                    onDeleteClick(it)
+        is HomeUiState.Success ->
+            if (
+                homeUiState.data.isEmpty()){
+                return Box (modifier = modifier.
+                fillMaxSize(),
+                    contentAlignment = Alignment.Center) {
+                    Text(text = "Tidak ada data Mahasiswa" )
                 }
-            )
-            deleteConfirmationRequired?.let { data ->
-                DeleteConfirmationDialog(
-                    onDeleteConfirm = {
-                        onDeleteClick(data)
-                        deleteConfirmationRequired = null
+            }else {
+                MhsLayout(
+                    mahasiswa = homeUiState.data,
+                    modifier = modifier.fillMaxWidth(),
+                    onDetailClick = {
+                        onDetailClick(it.nim)
                     },
-                    onDeleteCancel = {
-                        deleteConfirmationRequired = null
-                    })
+                    onDeleteClick = {
+                        onDeleteClick(it)
+                    }
+                )
             }
-        }
-        is HomeUiState.Error -> OnError(retryAction, modifier = modifier.fillMaxSize())
+        is HomeUiState.Error -> OnError(
+            message = homeUiState.message.message?:"Error",
+            retryAction,
+            modifier = modifier.fillMaxSize()
+        )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
-fun HomeScreen(
-    navigateToltemEntry: () -> Unit,
+fun OnLoading( modifier: Modifier = Modifier){
+    Column  (
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ){
+        Text("Loading....")
+    }
+}
+
+@Composable
+fun OnError(
+    message: String,
+    retryAction: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column (
+        modifier =  modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = message, modifier = Modifier.padding(16.dp))
+        Button(onClick = retryAction) {
+            Text("Retry")
+        }
+    }
+}
+
+@Composable
+fun MhsLayout(
+    mahasiswa: List<Mahasiswa>,
     modifier: Modifier = Modifier,
-    onDetailClick: (String) -> Unit = {},
-    viewMode: HomeViewModel = viewModel(factory = PenyediaViewModel.Factory)
+    onDetailClick: (Mahasiswa) -> Unit,
+    onDeleteClick: (Mahasiswa) -> Unit = {}
+) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(mahasiswa) { mahasiswa ->
+            MhsCard(
+                mahasiswa = mahasiswa,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onDetailClick(mahasiswa) },
+                onDeleteClick = {
+                    onDeleteClick(mahasiswa)
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun MhsCard(
+    mahasiswa: Mahasiswa,
+    modifier: Modifier = Modifier,
+    onDeleteClick: (Mahasiswa) -> Unit = {}
 ){
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    Scaffold (
-        topBar = {
-           TopAppBar(
-               title = {
-                   Text("Home")
-               }
-           )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = navigateToltemEntry,
-                shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.padding(18.dp)
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Kontak")
+    Card (
+        modifier = modifier,
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+    ) {
+        Column (
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ){
+            Row (
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text(
+                    text = mahasiswa.nama,
+                    style = MaterialTheme.typography.titleLarge,
+                )
+                Spacer(Modifier.weight(1f))
+                IconButton(onClick = { onDeleteClick(mahasiswa)}) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                    )
+                }
+                Text(
+                    text = mahasiswa.nim,
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
-        },
-    ){innerpadding ->
-        HomeStatus(
-            homeUiState = viewMode.mhsUiState,
-            retryAction = {viewMode.getMhs()}, modifier = Modifier.padding(innerpadding),
-            onDetailClick = onDetailClick,onDeleteClick ={
-                viewMode.getMhs()
-            }
-        )
+
+            Text(
+                text = mahasiswa.kelas,
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Text(
+                text = mahasiswa.alamat,
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
     }
 }

@@ -28,7 +28,7 @@ class HomeViewModel(
                     mhsUiState = HomeUiState.Loading
                 }
                 .catch {
-                    mhsUiState = HomeUiState.Error(e = it)
+                    mhsUiState = HomeUiState.Error(it)
                 }
                 .collect {
                     mhsUiState = if (it.isEmpty()) {
@@ -45,5 +45,5 @@ class HomeViewModel(
 sealed class HomeUiState {
     object Loading : HomeUiState()
     data class Success(val data: List<Mahasiswa>) : HomeUiState()
-    data class Error(val e: Throwable) : HomeUiState()
+    data class Error(val message: Throwable) : HomeUiState()
 }
