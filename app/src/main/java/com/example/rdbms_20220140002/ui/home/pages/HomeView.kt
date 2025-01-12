@@ -44,6 +44,30 @@ import com.example.rdbms_20220140002.ui.PenyediaViewModel
 import com.example.rdbms_20220140002.ui.home.viewmodel.HomeUiState
 import com.example.rdbms_20220140002.ui.home.viewmodel.HomeViewModel
 
+@Composable
+private fun DeleteConfirmationDialog(
+    onDeleteConfirm: () -> Unit,
+    onDeleteCancel: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AlertDialog(
+        onDismissRequest = { },
+        title = { Text("Delete Data") },
+        text = { Text("Apakah Anda Yakin Ingin Menghapus Data Ini?") },
+        modifier = modifier,
+        dismissButton = {
+            TextButton(onClick = onDeleteCancel) {
+                Text(text = "Cancel")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDeleteConfirm) {
+                Text(text = "Yes")
+            }
+        }
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -85,6 +109,7 @@ fun HomeStatus(
     onDeleteClick: (Mahasiswa) -> Unit = {},
     onDetailClick: (String) -> Unit
 ) {
+    var deleteConfirmationRequired by rememberSaveable { mutableStateOf<Mahasiswa?>(null) }
     when (homeUiState) {
         is HomeUiState.Loading -> OnLoading(modifier = modifier.fillMaxSize())
 
@@ -103,10 +128,20 @@ fun HomeStatus(
                     onDetailClick = {
                         onDetailClick(it.nim)
                     },
-                    onDeleteClick = {
-                        onDeleteClick(it)
-                    }
+                    onDeleteClick = { mhs ->
+                        deleteConfirmationRequired = mhs
+                    },
                 )
+                deleteConfirmationRequired?.let { data ->
+                    DeleteConfirmationDialog(
+                        onDeleteConfirm = {
+                            onDeleteClick(data)
+                            deleteConfirmationRequired = null
+                        },
+                        onDeleteCancel = {
+                            deleteConfirmationRequired = null
+                        })
+                }
             }
         is HomeUiState.Error -> OnError(
             message = homeUiState.message.message?:"Error",
