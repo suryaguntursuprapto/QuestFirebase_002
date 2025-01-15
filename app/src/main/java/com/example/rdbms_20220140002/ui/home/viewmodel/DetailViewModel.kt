@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 
 sealed class DetailUiState {
-    data class Success(val mahasiswa: Flow<Mahasiswa>) : DetailUiState()
+    data class Success(val mahasiswa: Mahasiswa) : DetailUiState()
     object Error : DetailUiState()
     object Loading : DetailUiState()
 }
@@ -29,7 +29,7 @@ class DetailViewModel(private val mhsRepository: RepositoryMhs) : ViewModel() {
         viewModelScope.launch {
             mhsDetailUiState = DetailUiState.Loading
             mhsDetailUiState = try {
-                val mahasiswa = mhsRepository.getMhs(nim)
+                val mahasiswa = mhsRepository.getMhs(nim).data
                 DetailUiState.Success(mahasiswa)
             } catch (e: IOException) {
                 DetailUiState.Error
