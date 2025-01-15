@@ -13,3 +13,8 @@ data class Mahasiswa (
 ){
     constructor(): this("","","","","","","","","")
 }
+data class MahasiswaDetailResponse(
+    val status: Boolean,
+    val message: String,
+    val data: Mahasiswa
+)
