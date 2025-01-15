@@ -1,14 +1,13 @@
 **Menu Home**
-![MenuHome](https://github.com/user-attachments/assets/186a5e99-4e7e-4f62-a7e3-f97b5fc2513f)
+![tampilanhomebaru](https://github.com/user-attachments/assets/f164547f-8138-44a9-ba8d-4b0804862833)
 
 **MenuInsert**
-![menuinsert](https://github.com/user-attachments/assets/1584eee6-6790-428f-af56-48e4096d44ce)
-**Insert Ketika disubmit dengan data Kosong**
-![insertkosong](https://github.com/user-attachments/assets/1380d2af-0076-4a18-a045-ac2b76f11054)
+![datakosonginsertbaru](https://github.com/user-attachments/assets/00797350-333a-414c-bc8a-1037677f211f)
 **isi Insert**
-![isiinsert](https://github.com/user-attachments/assets/f7acddff-6749-4e0a-9806-c015b3be361d)
+![isidatainsertbaru](https://github.com/user-attachments/assets/57857924-c3d1-42f7-a5ba-8223803665a7)
 **Hasil Insert**
-![hasilinsert](https://github.com/user-attachments/assets/1fa81834-20af-4299-ac26-3ffefdfe4914)
+![tampilaninsertbarutambah](https://github.com/user-attachments/assets/6ad7782d-0bdd-400e-ac4a-6705dd03acf2)
+
 
 **Delete Data Surya**
 ![DeleteSurya](https://github.com/user-attachments/assets/10447b93-5955-46ac-8ba7-2068d02bd435)
@@ -16,3 +15,6 @@
 ![tampilandelete](https://github.com/user-attachments/assets/1225420d-8c54-4685-89b6-a6d4394d4214)
 **Hasil delete**
 ![hasildelete](https://github.com/user-attachments/assets/5c094759-078a-4afb-b419-82f96e9777f3)
+
+**Menu detail**
+![tampilandetail](https://github.com/user-attachments/assets/823d393f-ad69-40c0-acc3-b1b576ed7a47)
