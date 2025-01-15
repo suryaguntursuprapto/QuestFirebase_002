@@ -29,8 +29,8 @@ class DetailViewModel(private val mhsRepository: RepositoryMhs) : ViewModel() {
         viewModelScope.launch {
             mhsDetailUiState = DetailUiState.Loading
             mhsDetailUiState = try {
-                val mahasiswa = mhsRepository.getMhs(nim).data
-                DetailUiState.Success(mahasiswa)
+                val mahasiswa = mhsRepository.getMhs(nim)
+                DetailUiState.Success(Mahasiswa())
             } catch (e: IOException) {
                 DetailUiState.Error
             } catch (e: HttpException) {

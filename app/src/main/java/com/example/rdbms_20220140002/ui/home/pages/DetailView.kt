@@ -42,7 +42,6 @@ import com.example.rdbms_20220140002.ui.home.viewmodel.DetailViewModel
 @Composable
 fun DetailScreen(
     navigateBack: () -> Unit,
-    navigateToEdit: (String) -> Unit,
     modifier: Modifier = Modifier,
     nim: String,
     viewModel: DetailViewModel = viewModel(factory = PenyediaViewModel.Factory)
@@ -55,7 +54,12 @@ fun DetailScreen(
 
     Scaffold(
         modifier = modifier,
-        topBar = { TopAppBar(title = { Text("Detail Mhs") }) },
+        topBar = { TopAppBar(title = { Text("Detail Mhs") }, navigationIcon = {
+            Button(onClick = navigateBack) {
+                Text(text = "Back")
+            }
+        }) },
+
 
     ) { innerPadding ->
         DetailStatus(

@@ -1,5 +1,7 @@
 package com.example.rdbms_20220140002.model
 
+import kotlinx.coroutines.flow.Flow
+
 data class Mahasiswa (
     val nim: String,
     val nama: String,
